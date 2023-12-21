@@ -6,3 +6,10 @@ spring:
     driver-class-name: org.h2.Driver
     generate-unique-name: false
     url: jdbc:h2:mem:testdb
+
+  jpa:
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
