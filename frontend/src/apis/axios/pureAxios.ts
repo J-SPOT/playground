@@ -10,6 +10,8 @@ import { axiosConfig } from './config';
 import { logOnDev } from './utils';
 
 const pureAxios: AxiosInstance = axios.create(axiosConfig);
+
+pureAxios.interceptors.request.use(onRequest);
 pureAxios.interceptors.response.use(onResponse, onErrorResponse);
 
 /**
@@ -34,7 +36,6 @@ function onResponse(response: AxiosResponse): AxiosResponse {
 
   logOnDev(`🚀 [API] ${method?.toUpperCase()} ${url} | Response ${status}`);
 
-  // TODO: 백엔드 상황별 response 확인필요
   if (status === 204) {
     return response;
   }
@@ -63,7 +64,6 @@ function onErrorResponse(error: AxiosError): Promise<AxiosError> {
     );
   }
 
-  // TODO: 에러 데이터 처리
   return Promise.reject(error);
 }
 export default pureAxios;
