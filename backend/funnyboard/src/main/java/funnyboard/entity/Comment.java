@@ -42,4 +42,11 @@ public class Comment {
                 dto.getContent()
         );
     }
+
+    public void patch(CommentForm dto) {
+        if (dto.getNickname() != null)
+            this.nickname = dto.getNickname();
+        if (dto.getContent() != null)
+            this.content = dto.getContent();
+    }
 }

@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -29,29 +32,33 @@ public class CommentServiceTest {
         Long articleId = 4L;
         CommentForm dto = new CommentForm(null, articleId, "juny", "hahah!! im jjang!");
 
-        Article article = articleRepository.findById(articleId).orElse(null);
-        Comment comment = Comment.createComment(dto, article);
-        Comment savedComment = commentRepository.save(comment);
         //when
-        System.out.println("savedComment.toString() = " + savedComment.toString());
+        CommentForm commentForm = commentService.create(articleId, dto);
 
         //then
-        assertThat(savedComment).isNotNull();
-        assertThat(savedComment.getId()).isEqualTo(10); // 이런식으로 하면 너무 db data에 종속적인데..
-        assertThat(savedComment.getNickname()).isEqualTo(dto.getNickname());
-        assertThat(savedComment.getContent()).isEqualTo(dto.getContent());
+        assertThat(commentForm).isNotNull();
+        assertThat(commentForm.getId()).isEqualTo(10); // 이런식으로 하면 너무 db data에 종속적인데..
+        assertThat(commentForm.getNickname()).isEqualTo(dto.getNickname());
+        assertThat(commentForm.getContent()).isEqualTo(dto.getContent());
     }
 
     @Test
     @DisplayName("게시글 댓글 조회하기")
     void 게시글_댓글_조회하기() {
         //given
-
+        Long articleId = 4L;
 
         //when
+        Article article = new Article(4L, "당신의 인생 영화는?", "댓점");
+        List<CommentForm> commentForms = commentService.lookupComments(articleId);
+
+        ArrayList<CommentForm> expected = new ArrayList<>();
+        expected.add(new CommentForm(1L, 4L, "juny", "인터스텔라"));
+        expected.add(new CommentForm(2L, 4L, "jiny", "1988"));
+        expected.add(new CommentForm(3L, 4L, "teacher", "라라랜드"));
 
         //then
-        assertThat(true).isEqualTo(true);
+        assertThat(commentForms.toString()).isEqualTo(expected.toString());
     }
 
     @Test
@@ -60,8 +67,13 @@ public class CommentServiceTest {
         //given
 
         //when
+        Comment expected = new Comment(1L, new Article(4L, "당신의 인생 영화는?", "댓점"), "케케", "크크");
+
+        CommentForm updated = commentService.update(1L, new CommentForm(1L, 1L, "케케", "크크"));
+        Comment actual = commentRepository.findById(1L).orElse(null);
 
         //then
+        assertThat(actual.toString()).isEqualTo(expected.toString());
     }
 
     @Test
@@ -70,8 +82,12 @@ public class CommentServiceTest {
         //given
 
         //when
+        CommentForm deletedData = commentService.delete(3L);
+        CommentForm notExistData = commentService.delete(3L);
 
         //then
+        assertThat(deletedData).isNotNull();
+        assertThat(notExistData).isNull();
     }
 
 }
