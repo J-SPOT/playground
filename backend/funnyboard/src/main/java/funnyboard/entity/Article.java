@@ -28,7 +28,4 @@ public class Article {
             this.content = dto.getContent();
         }
     }
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
 }
