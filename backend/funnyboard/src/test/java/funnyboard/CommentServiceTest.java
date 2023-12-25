@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("게시글 댓글 생성하기")
+    @Transactional
     void 게시글에_댓글_생성하기() {
         //given
         Long articleId = 4L;
@@ -63,6 +65,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("게시글 댓글 수정하기")
+    @Transactional
     void 게시글_댓글_수정하기() {
         //given
 
@@ -78,6 +81,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("게시글 댓글 삭제하기")
+    @Transactional
     void 게시글_댓글_삭제하기() {
         //given
 
