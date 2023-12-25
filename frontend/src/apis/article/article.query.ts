@@ -4,7 +4,7 @@ import { getArticles } from './article';
 
 export const useGetArticlesQuery = () => {
   return useQuery({
-    queryKey: [`api/${API_ENDPOINTS.ARTICLES}`],
+    queryKey: [`${API_ENDPOINTS.ARTICLES}`],
     queryFn: () => getArticles(),
   });
 };
