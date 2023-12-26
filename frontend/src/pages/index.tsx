@@ -1,14 +1,14 @@
-import { useGetArticlesQuery } from '@/apis/article/article.query'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import Area from '@/components/layouts/Area';
+import { styled } from 'twin.macro';
 
 export default function Home() {
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      메인 페이지
-    </main>
-  )
+    <Area>
+      <MainTitle>메인</MainTitle>
+    </Area>
+  );
 }
+
+const MainTitle = styled.h1`
+  font-size: 4rem;
+`;
