@@ -1,7 +1,7 @@
 package funnyboard.controller;
 
 import funnyboard.dto.ArticleForm;
-import funnyboard.entity.Article;
+import funnyboard.domain.Article;
 import funnyboard.repository.ArticleRepository;
 import funnyboard.service.ArticleService;
 import io.swagger.v3.oas.annotations.tags.Tag;

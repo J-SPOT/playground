@@ -1,6 +1,6 @@
 package funnyboard.repository;
 
-import funnyboard.entity.Comment;
+import funnyboard.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

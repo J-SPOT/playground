@@ -1,6 +1,6 @@
 package funnyboard.repository;
 
-import funnyboard.entity.Article;
+import funnyboard.domain.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

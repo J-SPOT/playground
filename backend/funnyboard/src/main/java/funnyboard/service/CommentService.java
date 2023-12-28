@@ -1,8 +1,8 @@
 package funnyboard.service;
 
 import funnyboard.dto.CommentForm;
-import funnyboard.entity.Article;
-import funnyboard.entity.Comment;
+import funnyboard.domain.Article;
+import funnyboard.domain.Comment;
 import funnyboard.repository.ArticleRepository;
 import funnyboard.repository.CommentRepository;
 import lombok.extern.slf4j.Slf4j;

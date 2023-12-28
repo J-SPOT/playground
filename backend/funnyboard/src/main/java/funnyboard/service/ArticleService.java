@@ -1,7 +1,7 @@
 package funnyboard.service;
 
 import funnyboard.dto.ArticleForm;
-import funnyboard.entity.Article;
+import funnyboard.domain.Article;
 import funnyboard.repository.ArticleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

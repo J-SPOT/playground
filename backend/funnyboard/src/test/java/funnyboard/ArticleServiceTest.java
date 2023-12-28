@@ -2,7 +2,7 @@ package funnyboard;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import funnyboard.dto.ArticleForm;
-import funnyboard.entity.Article;
+import funnyboard.domain.Article;
 import funnyboard.repository.ArticleRepository;
 import funnyboard.service.ArticleService;
 import org.junit.jupiter.api.BeforeEach;

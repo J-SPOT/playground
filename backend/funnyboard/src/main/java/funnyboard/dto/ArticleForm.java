@@ -1,6 +1,6 @@
 package funnyboard.dto;
 
-import funnyboard.entity.Article;
+import funnyboard.domain.Article;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

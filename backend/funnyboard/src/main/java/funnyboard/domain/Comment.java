@@ -1,4 +1,4 @@
-package funnyboard.entity;
+package funnyboard.domain;
 
 import funnyboard.dto.CommentForm;
 import jakarta.persistence.*;
