@@ -2,6 +2,7 @@ package funnyboard.controller;
 
 import funnyboard.dto.ArticleForm;
 import funnyboard.domain.Article;
+import funnyboard.dto.ArticleUpdateRequest;
 import funnyboard.repository.ArticleRepository;
 import funnyboard.service.ArticleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,7 +49,7 @@ public class ArticleController {
     }
 
     @PatchMapping("/api/articles/{id}")
-    public ResponseEntity<Article> update(@PathVariable Long id, @RequestBody ArticleForm dto) {
+    public ResponseEntity<Article> update(@PathVariable Long id, @RequestBody ArticleUpdateRequest dto) {
         Article updated = articleService.update(id, dto);
         return (updated != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(updated) :

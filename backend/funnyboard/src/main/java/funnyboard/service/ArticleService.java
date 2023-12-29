@@ -2,6 +2,7 @@ package funnyboard.service;
 
 import funnyboard.dto.ArticleForm;
 import funnyboard.domain.Article;
+import funnyboard.dto.ArticleUpdateRequest;
 import funnyboard.repository.ArticleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class ArticleService {
         return article;
     }
 
-    public Article update(Long id, ArticleForm dto) {
+    public Article update(Long id, ArticleUpdateRequest dto) {
         Article article = dto.toEntity();
         if (id != dto.getId()) {
             log.error("update 요청 id:{}와 게시글 생성 id:{}와 같지 않습니다.", id, dto.getId());
