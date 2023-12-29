@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ArticleServiceTest {
@@ -31,63 +31,73 @@ public class ArticleServiceTest {
     private ArticleService articleService;
 
     Article article1, article2;
-    ArticleForm articleForm1;
+    ArticleForm articleFormRequest,
+            articleForm1,
+            articleForm2;
     ArticleUpdateRequest articleUpdateRequest1, articleUpdateRequest2;
 
     @BeforeEach
     void setup() {
-        articleForm1 = new ArticleForm(null, "제목 1", "내용 1");
+        articleFormRequest = new ArticleForm(null, "제목 1", "내용 1");
 
         articleUpdateRequest1 = new ArticleUpdateRequest(1L, "제목 수정 1", "내용 수정 1");
         articleUpdateRequest2 = new ArticleUpdateRequest(1L, "제목 수정 1", null);
 
+        articleForm1 = new ArticleForm(1L, "제목 1", "내용 1");
+        articleForm2 = new ArticleForm(2L, "제목 2", "내용 2");
+
         article1 = new Article(1L, "제목 1", "내용 1");
         article2 = new Article(2L, "제목 2", "내용 2");
     }
-    
+
     @DisplayName("모든 게시글 조회하기")
     @Test
     void FindArticles_ReturnFindArticles() {
         //given
-        List<Article> mockArticles = Arrays.asList(article1, article2);
-        Mockito.when(articleRepository.findAll()).thenReturn(mockArticles);
+        List<Article> articles = Arrays.asList(article1, article2);
+        List<ArticleForm> articlesForm = articles.stream().map(Article::toForm).collect(Collectors.toList());
+        Mockito.when(articleRepository.findAll()).thenReturn(articles);
 
         //when
-        List<Article> allArticles = articleService.findAllArticles();
+        List<ArticleForm> allArticlesForm = articleService.findAllArticles();
 
         //then
-        assertThat(allArticles).isNotNull();
-        assertThat(allArticles).isEqualTo(mockArticles);
+        assertThat(allArticlesForm).isNotNull();
+        assertThat(allArticlesForm).usingRecursiveComparison().isEqualTo(articlesForm);
     }
     
     @DisplayName("특정 게시글 조회하기")
     @Test
     void FindArticle_ReturnFindArticle() {
         //given
-        Article mockArticle = article1;
-        Mockito.when(articleRepository.findById(mockArticle.getId())).thenReturn(Optional.of(mockArticle));
+        Article article = article1;
+        ArticleForm articleForm = Article.toForm(article);
+        Mockito.when(articleRepository.findById(article.getId())).thenReturn(Optional.of(article));
 
         //when
-        Article findArticle = articleService.findArticleById(article1.getId());
+        ArticleForm findArticleForm = articleService.findArticleById(article1.getId());
 
         //then
-        assertThat(findArticle).isNotNull();
-        assertThat(findArticle).isEqualTo(mockArticle);
+        assertThat(findArticleForm).isNotNull();
+        assertThat(findArticleForm).usingRecursiveComparison().isEqualTo(articleForm);
     }
     
     @DisplayName("특정 게시글 생성하기")
     @Test
     void CreateArticle_ReturnCreatedArticle() {
         //given
-        Article mockArticle = article1;
-        Mockito.when(articleRepository.save(Mockito.any(Article.class))).thenReturn(mockArticle);
+        ArticleForm articleForm = articleFormRequest;
+        Article article = article1;
+
+        Mockito.when(articleRepository.save(Mockito.any(Article.class))).thenReturn(article);
+
 
         //when
-        Article createdArticle = articleService.create(articleForm1);
+        ArticleForm createdArticleForm = articleService.create(articleForm);
 
         //then
-        assertThat(createdArticle).isNotNull();
-        assertThat(createdArticle).isEqualTo(mockArticle);
+        assertThat(createdArticleForm).isNotNull();
+        assertThat(createdArticleForm).usingRecursiveComparison().isEqualTo(Article.toForm(article));
     }
 
     @DisplayName("특정 게시글 제목과 내용 변경하기")
@@ -99,13 +109,13 @@ public class ArticleServiceTest {
         Mockito.when(articleRepository.save(Mockito.any(Article.class))).thenReturn(mockArticle);
 
         //when
-        Article updatedArticle = articleService.update(mockArticle.getId(), articleUpdateRequest1);
+        ArticleForm articleForm = articleService.update(mockArticle.getId(), articleUpdateRequest1);
 
         //then
-        assertThat(updatedArticle).isEqualTo(mockArticle);
-        assertThat(updatedArticle.getId()).isEqualTo(articleUpdateRequest1.getId());
-        assertThat(updatedArticle.getTitle()).isEqualTo(articleUpdateRequest1.getTitle());
-        assertThat(updatedArticle.getContent()).isEqualTo(articleUpdateRequest1.getContent());
+        assertThat(articleForm).usingRecursiveComparison().isEqualTo(Article.toUpdateRequest(mockArticle));
+        assertThat(articleForm.getId()).isEqualTo(articleUpdateRequest1.getId());
+        assertThat(articleForm.getTitle()).isEqualTo(articleUpdateRequest1.getTitle());
+        assertThat(articleForm.getContent()).isEqualTo(articleUpdateRequest1.getContent());
     }
 
     @DisplayName("특정 게시글 제목만 변경하기")
@@ -117,7 +127,7 @@ public class ArticleServiceTest {
         Mockito.when(articleRepository.save(Mockito.any(Article.class))).thenReturn(mockArticle);
 
         //when
-        Article updatedArticle = articleService.update(mockArticle.getId(), articleUpdateRequest2);
+        ArticleForm updatedArticle = articleService.update(mockArticle.getId(), articleUpdateRequest2);
 
         //then
         assertThat(updatedArticle.getId()).isEqualTo(articleUpdateRequest2.getId());
@@ -133,14 +143,14 @@ public class ArticleServiceTest {
         Mockito.doNothing().when(articleRepository).delete(article1);
 
         //when
-        Article deletedArticle = articleService.delete(article1.getId());
+        ArticleForm deletedArticleForm = articleService.delete(article1.getId());
 
         //then
         Mockito.verify(articleRepository).delete(article1);
-        assertThat(deletedArticle).isEqualTo(article1);
+        assertThat(deletedArticleForm).usingRecursiveComparison().isEqualTo(Article.toForm(article1));
     }
 
-    @DisplayName("존재하지 않는 특정 게시글 삭제하기")
+    @DisplayName("존재 하지 않는 특정 게시글 삭제하기")
     @Test
     void DeleteArticleNotExist_ReturnNull() {
         //given
@@ -152,6 +162,6 @@ public class ArticleServiceTest {
         assertThatThrownBy(() -> {
             articleService.delete(article1.getId());
         }).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("delete, 존재하지 않는 게시글입니다.");
+                .hasMessageContaining("delete, 존재하지 않는 게시글 입니다.");
     }
 }

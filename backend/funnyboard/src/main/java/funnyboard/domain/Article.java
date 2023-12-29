@@ -1,6 +1,7 @@
 package funnyboard.domain;
 
 
+import funnyboard.dto.ArticleForm;
 import funnyboard.dto.ArticleUpdateRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +23,15 @@ public class Article {
     private Long id;
     private String title;
     private String content;
+
+    public static ArticleForm toForm(Article article) {
+        return new ArticleForm(article.getId(), article.getTitle(), article.getContent());
+    }
+    public static ArticleUpdateRequest toUpdateRequest(Article article) {
+        return new ArticleUpdateRequest(article.getId(), article.getTitle(), article.getContent());
+    }
+
+
 
     public void patch(ArticleUpdateRequest dto) {
         if (dto.getTitle() != null) {
