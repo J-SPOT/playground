@@ -71,13 +71,8 @@ public class ArticleService {
 
     public Article delete(Long id) {
         Article article = articleRepository.findById(id).orElse(null);
-        try {
-            if (article == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception e) {
-            log.error("delete, 존재하지 않는 게시글입니다.");
-            return null;
+        if (article == null) {
+            throw new IllegalArgumentException("delete, 존재하지 않는 게시글입니다.");
         }
         articleRepository.delete(article);
         return article;
