@@ -34,7 +34,7 @@ public class CommentService {
         return CommentForm.createCommentDto(created);
     }
 
-    public List<CommentForm> lookupComments(Long articleId) {
+    public List<CommentForm> findAllComments(Long articleId) {
         return commentRepository.findByArticleId(articleId)
                 .stream()
                 .map(comment -> CommentForm.createCommentDto(comment))
@@ -58,8 +58,7 @@ public class CommentService {
     public CommentForm delete(Long id) {
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment == null) {
-            log.error("delete, 댓글 삭제 실패! 존재 하지 않는 댓글입니다.");
-            return null;
+            throw new IllegalArgumentException("delete, 댓글 삭제 실패! 존재 하지 않는 댓글입니다.");
         }
         commentRepository.delete(comment);
         return CommentForm.createCommentDto(comment);
