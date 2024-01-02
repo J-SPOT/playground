@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArticleForm {
+@Getter
+public class ArticleUpdateRequest {
     private Long id;
     private String title;
     private String content;

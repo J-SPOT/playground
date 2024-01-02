@@ -1,97 +1,132 @@
 package funnyboard;
 
+import funnyboard.domain.Article;
+import funnyboard.domain.Comment;
 import funnyboard.dto.CommentForm;
-import funnyboard.entity.Article;
-import funnyboard.entity.Comment;
 import funnyboard.repository.ArticleRepository;
 import funnyboard.repository.CommentRepository;
 import funnyboard.service.CommentService;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
-    @Autowired
-    CommentRepository commentRepository;
-    @Autowired
-    CommentService commentService;
-    @Autowired
-    ArticleRepository articleRepository;
+    @Mock
+    private CommentRepository commentRepository;
 
-    @Test
-    @DisplayName("게시글 댓글 생성하기")
-    @Transactional
-    void 게시글에_댓글_생성하기() {
-        //given
-        Long articleId = 4L;
-        CommentForm dto = new CommentForm(null, articleId, "juny", "hahah!! im jjang!");
+    @Mock
+    private ArticleRepository articleRepository;
+    
+    @InjectMocks
+    private CommentService commentService;
 
-        //when
-        CommentForm commentForm = commentService.create(articleId, dto);
+    Article article1, article2;
+    Comment comment1, comment2, comment3, beforeUpdateComment, updatedComment, createdComment;
+    CommentForm createForm, updateForm;
 
-        //then
-        assertThat(commentForm).isNotNull();
-        assertThat(commentForm.getId()).isEqualTo(10); // 이런식으로 하면 너무 db data에 종속적인데..
-        assertThat(commentForm.getNickname()).isEqualTo(dto.getNickname());
-        assertThat(commentForm.getContent()).isEqualTo(dto.getContent());
+    @BeforeEach
+    void setup() {
+        article1 = new Article(1L, "제목 1", "내용 1");
+        article2 = new Article(2L, "제목 2", "내용 2");
+        comment1 = new Comment(null, article1, "작성자 1", "내용 1");
+        comment2 = new Comment(null, article1, "작성자 1", "내용 2");
+        comment3 = new Comment(null, article1, "작성자 2", "내용 3");
+        beforeUpdateComment = new Comment(1L, article1, "작성자 1", "내용 1");
+        updatedComment = new Comment(1L, article1, "작성자 1 수정", "내용 1 수정");
+
+        createdComment = new Comment(1L, article1, "작성자 1", "내용 1");
+        updateForm = new CommentForm(1L, article1.getId(), "작성자 1 수정", "내용 1 수정");
+        createForm = new CommentForm(null, article1.getId(), "작성자 1", "내용 1");
     }
 
+    @DisplayName("특정 게시글에 모든 댓글 가져오기")
     @Test
-    @DisplayName("게시글 댓글 조회하기")
-    void 게시글_댓글_조회하기() {
+    void FindComments_ReturnFindComments() {
         //given
-        Long articleId = 4L;
+        List<Comment> comments = Arrays.asList(comment1, comment2, comment3);
+        Mockito.when(commentRepository.findByArticleId(article1.getId())).thenReturn(comments);
 
         //when
-        Article article = new Article(4L, "당신의 인생 영화는?", "댓점");
-        List<CommentForm> commentForms = commentService.lookupComments(articleId);
-
-        ArrayList<CommentForm> expected = new ArrayList<>();
-        expected.add(new CommentForm(1L, 4L, "juny", "인터스텔라"));
-        expected.add(new CommentForm(2L, 4L, "jiny", "1988"));
-        expected.add(new CommentForm(3L, 4L, "teacher", "라라랜드"));
+        List<CommentForm> findCommentsDto = commentService.findAllComments(article1.getId());
+        List<Comment> findComments = findCommentsDto.stream()
+                .map(comment -> Comment.createComment(comment, article1))
+                .collect(Collectors.toList());
 
         //then
-        assertThat(commentForms.toString()).isEqualTo(expected.toString());
+        assertThat(findComments).isNotNull();
+        assertThat(findComments).usingRecursiveComparison().isEqualTo(comments);
     }
 
+    @DisplayName("특정 게시글에 특정 댓글 수정하기")
     @Test
-    @DisplayName("게시글 댓글 수정하기")
-    @Transactional
-    void 게시글_댓글_수정하기() {
+    void UpdateComment_ReturnUpdatedComment() {
         //given
+        Mockito.when(commentRepository.findById(beforeUpdateComment.getId())).thenReturn(Optional.of(updatedComment));
+        Mockito.when(commentRepository.save(updatedComment)).thenReturn(updatedComment);
 
         //when
-        Comment expected = new Comment(1L, new Article(4L, "당신의 인생 영화는?", "댓점"), "케케", "크크");
+        CommentForm updatedForm = commentService.update(beforeUpdateComment.getId(), updateForm);
 
-        CommentForm updated = commentService.update(1L, new CommentForm(1L, 1L, "케케", "크크"));
-        Comment actual = commentRepository.findById(1L).orElse(null);
 
         //then
-        assertThat(actual.toString()).isEqualTo(expected.toString());
+        assertThat(updatedForm).isNotNull();
+        assertThat(updatedForm).usingRecursiveComparison().isEqualTo(updateForm);
     }
 
+    @DisplayName("특정 댓글 생성하기")
     @Test
-    @DisplayName("게시글 댓글 삭제하기")
-    @Transactional
-    void 게시글_댓글_삭제하기() {
+    void CreateComment_ReturnCreatedComment() {
         //given
+        Mockito.when(articleRepository.findById(article1.getId())).thenReturn(Optional.of(article1));
+        Mockito.when(commentRepository.save(Mockito.any(Comment.class))).thenReturn(comment1);
+                
+        //when
+        CommentForm createdForm = commentService.create(article1.getId(), createForm);
+
+        //then
+        assertThat(createdForm).isNotNull();
+        assertThat(createdForm).usingRecursiveComparison().isEqualTo(createForm);
+    }
+
+    @DisplayName("존재하는 특정 게시글 삭제하기")
+    @Test
+    void DeleteArticle_ReturnDeletedArticle() {
+        //given
+        Mockito.when(commentRepository.findById(createdComment.getId())).thenReturn(Optional.of(createdComment));
+        Mockito.doNothing().when(commentRepository).delete(createdComment);
 
         //when
-        CommentForm deletedData = commentService.delete(3L);
-        CommentForm notExistData = commentService.delete(3L);
+        CommentForm deletedForm = commentService.delete(article1.getId());
 
         //then
-        assertThat(deletedData).isNotNull();
-        assertThat(notExistData).isNull();
+        Mockito.verify(commentRepository).delete(createdComment);
     }
+    @DisplayName("존재 하지 않는 특정 게시글 삭제하기")
+    @Test
+    void DeleteArticleNotExist_ReturnNull() {
+        //given
+        Mockito.when(commentRepository.findById(comment1.getId())).thenReturn(Optional.empty());
 
+        //when
+
+        //then
+        Assertions.assertThatThrownBy(() -> {
+            commentService.delete(comment1.getId());
+        }).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("delete, 댓글 삭제 실패! 존재 하지 않는 댓글입니다.");
+    }
 }

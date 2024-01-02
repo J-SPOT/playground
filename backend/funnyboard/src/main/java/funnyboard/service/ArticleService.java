@@ -1,12 +1,14 @@
 package funnyboard.service;
 
+import funnyboard.domain.Article;
 import funnyboard.dto.ArticleForm;
-import funnyboard.entity.Article;
+import funnyboard.dto.ArticleUpdateRequest;
 import funnyboard.repository.ArticleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -18,67 +20,43 @@ public class ArticleService {
         this.articleRepository = articleRepository;
     }
 
-    public Article create(ArticleForm dto) {
-        // 제대로된 정보가 입력되었는지 validation check
-        try {
-            if (dto.getId() != null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception e) {
-            log.error("create, dto get id:{}", dto.getId());
-            return null;
+    public ArticleForm create(ArticleForm dto) {
+        if (dto.getId() != null) {
+            throw new IllegalArgumentException("create, dto get id:" + dto.getId());
         }
         Article savedArticle = articleRepository.save(dto.toEntity());
-        return savedArticle;
+        return Article.toForm(savedArticle);
     }
 
-    public List<Article> findAllArticles() {
-        return articleRepository.findAll();
+    public List<ArticleForm> findAllArticles() {
+        return articleRepository.findAll()
+                .stream()
+                .map(Article::toForm)
+                .collect(Collectors.toList());
     }
 
-    public Article findArticleById(Long id) {
-        Article article = articleRepository.findById(id).orElse(null);
-        try {
-            if (article == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception e) {
-            log.error("findArticleById, articles are {}", article);
-        }
-        return article;
+    public ArticleForm findArticleById(Long id) {
+        return articleRepository.findById(id)
+                .map(Article::toForm)
+                .orElseThrow(() -> new IllegalArgumentException("findArticleById, article not found id: " + id));
     }
 
-    public Article update(Long id, ArticleForm dto) {
+    public ArticleForm update(Long id, ArticleUpdateRequest dto) {
         Article article = dto.toEntity();
         if (id != dto.getId()) {
-            log.error("update 요청 id:{}와 게시글 생성 id:{}와 같지 않습니다.", id, dto.getId());
-            return null;
+            throw new IllegalArgumentException("update, 요청 id: " + id + "게시글 생성 id: " + dto.getId() + "와 같지 않습니다.");
         }
-        Article origin = articleRepository.findById(id).orElse(null);
-        try {
-            if (origin == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception e) {
-            log.error("update, 기존 내용이 없습니다. {}", e.getMessage());
-            return null;
-        }
+        Article origin = articleRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("update, 존재하지 않는 게시글 입니다."));
         origin.patch(dto);
         Article savedArticle = articleRepository.save(origin);
-        return savedArticle;
+        return Article.toForm(savedArticle);
     }
 
-    public Article delete(Long id) {
-        Article article = articleRepository.findById(id).orElse(null);
-        try {
-            if (article == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception e) {
-            log.error("delete, 존재하지 않는 게시글입니다.");
-            return null;
-        }
+    public ArticleForm delete(Long id) {
+        Article article = articleRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("delete, 존재하지 않는 게시글 입니다."));
         articleRepository.delete(article);
-        return article;
+        return Article.toForm(article);
     }
 }

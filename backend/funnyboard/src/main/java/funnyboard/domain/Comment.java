@@ -1,4 +1,4 @@
-package funnyboard.entity;
+package funnyboard.domain;
 
 import funnyboard.dto.CommentForm;
 import jakarta.persistence.*;
@@ -31,8 +31,6 @@ public class Comment {
             throw new IllegalArgumentException("createComment, 댓글 생성 실패! 댓글의 아이디가 없어야 합니다.");
         }
         if (dto.getArticleId() != article.getId()) {
-            System.out.println("dto.getArticleId() = " + dto.getArticleId());
-            System.out.println("article.getId() = " + article.getId());
             throw new IllegalArgumentException("createComment, 댓글 생성 실패! 게시글의 아이디가 잘못되었습니다.");
         }
         return new Comment(
