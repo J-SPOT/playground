@@ -1,6 +1,7 @@
 package funnyboard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import funnyboard.config.error.exception.article.ArticleNotFoundException;
 import funnyboard.controller.ArticleController;
 import funnyboard.domain.Article;
 import funnyboard.dto.ArticleForm;
@@ -107,7 +108,7 @@ public class ArticleControllerTest {
     void DeleteArticleById_ReturnDeleteArticle() throws Exception {
         //given
 
-        Mockito.when(articleService.delete(article1.getId())).thenThrow(new IllegalArgumentException());
+        Mockito.when(articleService.delete(article1.getId())).thenThrow(new ArticleNotFoundException());
 
 
         //when
@@ -115,6 +116,6 @@ public class ArticleControllerTest {
 
         //then
         resultActions
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }
