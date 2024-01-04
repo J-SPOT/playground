@@ -33,7 +33,6 @@ public class ArticleController {
     @GetMapping("/api/articles/{id}")
     public ResponseEntity<ArticleForm> findArticleById(@PathVariable("id") Long id) {
         ArticleForm articleForm = articleService.findArticleById(id);
-
         return (articleForm != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(articleForm) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -42,7 +41,6 @@ public class ArticleController {
     @PostMapping("/api/articles")
     public ResponseEntity<ArticleForm> create(@RequestBody ArticleForm dto) {
         ArticleForm articleForm = articleService.create(dto);
-
         return (articleForm != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(articleForm) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -51,7 +49,6 @@ public class ArticleController {
     @PatchMapping("/api/articles/{id}")
     public ResponseEntity<ArticleForm> update(@PathVariable("id") Long id, @RequestBody ArticleUpdateRequest dto) {
         ArticleForm articleForm = articleService.update(id, dto);
-
         return (articleForm != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(articleForm) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -59,11 +56,9 @@ public class ArticleController {
 
     @DeleteMapping("/api/articles/{id}")
     public ResponseEntity<ArticleForm> delete(@PathVariable("id") Long id) {
-        try {
-            articleService.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        ArticleForm articleForm = articleService.delete(id);
+        return (articleForm != null) ?
+                ResponseEntity.status(HttpStatus.OK).build() :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

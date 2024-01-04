@@ -46,11 +46,9 @@ public class CommentController {
 
     @DeleteMapping("/api/comments/{id}")
     public ResponseEntity<CommentForm> delete(@PathVariable("id") Long id) {
-        try {
-            commentService.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        CommentForm deletedForm = commentService.delete(id);
+        return (deletedForm != null) ?
+                ResponseEntity.status(HttpStatus.OK).build() :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
