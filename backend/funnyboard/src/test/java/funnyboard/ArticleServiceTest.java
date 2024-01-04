@@ -1,5 +1,6 @@
 package funnyboard;
 
+import funnyboard.config.error.exception.article.ArticleNotFoundException;
 import funnyboard.domain.Article;
 import funnyboard.dto.ArticleForm;
 import funnyboard.dto.ArticleUpdateRequest;
@@ -161,7 +162,7 @@ public class ArticleServiceTest {
         //then
         assertThatThrownBy(() -> {
             articleService.delete(article1.getId());
-        }).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("delete, 존재하지 않는 게시글 입니다.");
+        }).isInstanceOf(ArticleNotFoundException.class)
+                .hasMessageContaining("A1");
     }
 }

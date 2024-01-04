@@ -1,5 +1,6 @@
 package funnyboard;
 
+import funnyboard.config.error.exception.comment.CommentNotFoundException;
 import funnyboard.domain.Article;
 import funnyboard.domain.Comment;
 import funnyboard.dto.CommentForm;
@@ -126,7 +127,7 @@ public class CommentServiceTest {
         //then
         Assertions.assertThatThrownBy(() -> {
             commentService.delete(comment1.getId());
-        }).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("delete, 댓글 삭제 실패! 존재 하지 않는 댓글입니다.");
+        }).isInstanceOf(CommentNotFoundException.class)
+                .hasMessageContaining("C1");
     }
 }
